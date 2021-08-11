@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from math import ceil
 
 
 @dataclass(eq=False)
