@@ -1,8 +1,6 @@
 from os import path
 
-import pytest
-
-from src.app.app import Balanceador, Servidor, Usuário
+from src.app.app import Balanceador, main, Servidor, Usuário
 
 """
     tick - unidade básica de tempo de simulação
@@ -149,3 +147,12 @@ class TestBalanceador:
         esperado = '1\n2,2\n2,2\n2,2,1\n1,2,1\n2\n2\n1\n1\n15'
         retorno = balanceador.processa_tarefas()
         assert retorno == esperado
+
+
+def test_main():
+    """ teste repetido para somente validar o ponto de entrada."""
+    retorno = main(
+        path.join(path.dirname(__file__), 'input.txt')
+    )
+    esperado = '1\n2,2\n2,2\n2,2,1\n1,2,1\n2\n2\n1\n1\n15'
+    assert retorno == esperado

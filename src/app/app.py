@@ -122,3 +122,8 @@ class Balanceador:
         saída.append(str(self._custo_total))
 
         return '\n'.join(s for s in saída if s)
+
+
+def main(path_entrada):
+    balanceador = Balanceador(path_entrada)
+    return balanceador.processa_tarefas()
