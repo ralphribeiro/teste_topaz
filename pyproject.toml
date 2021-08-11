@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "teste_topaz"
+version = "0.1.0"
+description = ""
+authors = ["ralphribeiro <ralph_ribeiro@msn.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pytest = "^6.2.4"
+pytest-cov = "^2.12.1"
+
+[tool.poetry.dev-dependencies]
+autopep8 = "^1.5.7"
+pylama = "^7.7.1"
+rope = "^0.19.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
