@@ -88,21 +88,7 @@ class TesteServidor:
         assert usuário2 in servidor.usuários
         assert usuário3 not in servidor.usuários
 
-
-class TestBalanceador:
-    def test_carrega_entrada_válida(self):
-        balanceador = Balanceador(
-            path.join(path.dirname(__file__), 'input.txt')
-        )
-        assert balanceador._ttask == 4
-        assert balanceador._umax == 2
-        assert balanceador._numero_novos_usuários == [1, 3, 0, 1, 0, 1]
-
     def test_na_comparação_o_maior_é_o_com_maior_ticks_a_processar(self):
-        balanceador = Balanceador(
-            path.join(path.dirname(__file__), 'input_test.txt')
-        )
-
         usuário1 = Usuário(1)
         usuário2 = Usuário(2)
         usuário3 = Usuário(3)
@@ -116,6 +102,16 @@ class TestBalanceador:
         servidor2.adiciona_usuário(usuário4)
 
         assert servidor2 > servidor1
+
+
+class TestBalanceador:
+    def test_carrega_entrada_válida(self):
+        balanceador = Balanceador(
+            path.join(path.dirname(__file__), 'input.txt')
+        )
+        assert balanceador._ttask == 4
+        assert balanceador._umax == 2
+        assert balanceador._numero_novos_usuários == [1, 3, 0, 1, 0, 1]
 
     def test_cria_usuario_servidor(self):
         balanceador = Balanceador(
