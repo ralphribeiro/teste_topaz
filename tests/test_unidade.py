@@ -1,6 +1,9 @@
 from os import path
 
-from src.app.app import Balanceador, main, Servidor, Usuário
+from src.app.app import (
+    Balanceador, cria_servidor_tipo_um, cria_usuário, main, Servidor,
+    ServidorTipoUm, Usuário
+)
 
 """
     tick - unidade básica de tempo de simulação
@@ -37,13 +40,13 @@ e ao final, o custo total por utilização dos servidores.
 class TesteServidor:
     def test_usuarios_conectam_em_servidores_disponíveis(self):
         usuário = Usuário(ttask=1)
-        servidor = Servidor(umax=1)
+        servidor = ServidorTipoUm(umax=1)
         servidor.adiciona_usuário(usuário)
         assert usuário in servidor.usuários
 
     def test_tarefa_6_ticks_decrementa_para_5_num_tick(self):
         usuário = Usuário(ttask=6)
-        servidor = Servidor(umax=1)
+        servidor = ServidorTipoUm(umax=1)
         servidor.adiciona_usuário(usuário)
         servidor.tick()
         assert usuário.ttask == 5
@@ -51,7 +54,7 @@ class TesteServidor:
     def test_usuario_se_desconecta_automaticamente(self):
         usuário = Usuário(ttask=3)
         usuário2 = Usuário(ttask=4)
-        servidor = Servidor(umax=2)
+        servidor = ServidorTipoUm(umax=2)
         servidor.adiciona_usuário(usuário)
         servidor.adiciona_usuário(usuário2)
         for _ in range(3):
@@ -61,7 +64,7 @@ class TesteServidor:
     def test_verifica_se_pode_ser_finalizado(self):
         ticks = 2
         usuário = Usuário(ttask=ticks)
-        servidor = Servidor(umax=2)
+        servidor = ServidorTipoUm(umax=2)
         servidor.adiciona_usuário(usuário)
         for _ in range(ticks):
             servidor.tick()
@@ -70,7 +73,7 @@ class TesteServidor:
     def test_tarefa_5_ticks_a_1_real_custa_5_reais(self):
         ttask = 5
         usuário = Usuário(ttask=ttask)
-        servidor = Servidor(umax=1)
+        servidor = ServidorTipoUm(umax=1)
         servidor.adiciona_usuário(usuário)
         for _ in range(ttask):
             servidor.tick()
@@ -80,7 +83,7 @@ class TesteServidor:
         usuário1 = Usuário(ttask=2)
         usuário2 = Usuário(ttask=2)
         usuário3 = Usuário(ttask=2)
-        servidor = Servidor(umax=2)
+        servidor = ServidorTipoUm(umax=2)
         servidor.adiciona_usuário(usuário1)
         servidor.adiciona_usuário(usuário2)
         servidor.adiciona_usuário(usuário3)
@@ -94,20 +97,29 @@ class TesteServidor:
         usuário3 = Usuário(3)
         usuário4 = Usuário(4)
 
-        servidor1 = Servidor(2)
+        servidor1 = ServidorTipoUm(2)
         servidor1.adiciona_usuário(usuário1)
         servidor1.adiciona_usuário(usuário2)
-        servidor2 = Servidor(2)
+        servidor2 = ServidorTipoUm(2)
         servidor2.adiciona_usuário(usuário3)
         servidor2.adiciona_usuário(usuário4)
 
         assert servidor2 > servidor1
 
 
+def test_cria_usuário():
+    assert isinstance(cria_usuário(1), Usuário)
+
+def test_cria_servidor_tipo_um():
+    assert isinstance(cria_servidor_tipo_um(1), Servidor)
+
+
 class TestBalanceador:
     def test_carrega_entrada_válida(self):
         balanceador = Balanceador(
-            path.join(path.dirname(__file__), 'input.txt')
+            path.join(path.dirname(__file__), 'input.txt'),
+            cria_usuário,
+            cria_servidor_tipo_um
         )
         assert balanceador._ttask == 4
         assert balanceador._umax == 2
@@ -115,14 +127,18 @@ class TestBalanceador:
 
     def test_cria_usuario_servidor(self):
         balanceador = Balanceador(
-            path.join(path.dirname(__file__), 'input_test.txt')
+            path.join(path.dirname(__file__), 'input_test.txt'),
+            cria_usuário,
+            cria_servidor_tipo_um
         )
         balanceador._associa_usuários_servidores(1)
         assert len(balanceador._servidores) == 1
 
     def test_cria_usuários_em_servidores(self):
         balanceador = Balanceador(
-            path.join(path.dirname(__file__), 'input_test2.txt')
+            path.join(path.dirname(__file__), 'input_test2.txt'),
+            cria_usuário,
+            cria_servidor_tipo_um
         )
         balanceador._associa_usuários_servidores(2)
         balanceador._associa_usuários_servidores(1)
@@ -131,14 +147,18 @@ class TestBalanceador:
 
     def test_servidor_removido_quando_finalizado(self):
         balanceador = Balanceador(
-            path.join(path.dirname(__file__), 'input_test.txt')
+            path.join(path.dirname(__file__), 'input_test.txt'),
+            cria_usuário,
+            cria_servidor_tipo_um
         )
         balanceador.processa_tarefas()
         assert len(balanceador._servidores) == 0
 
     def test_processa_tarefas(self):
         balanceador = Balanceador(
-            path.join(path.dirname(__file__), 'input.txt')
+            path.join(path.dirname(__file__), 'input.txt'),
+            cria_usuário,
+            cria_servidor_tipo_um
         )
         esperado = '1\n2,2\n2,2\n2,2,1\n1,2,1\n2\n2\n1\n1\n15'
         retorno = balanceador.processa_tarefas()
@@ -146,7 +166,6 @@ class TestBalanceador:
 
 
 def test_main():
-    """ teste repetido para somente validar o ponto de entrada."""
     retorno = main(
         path.join(path.dirname(__file__), 'input.txt')
     )

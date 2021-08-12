@@ -1,4 +1,6 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from typing import Callable
 
 
 @dataclass(eq=False)
@@ -7,8 +9,8 @@ class Usuário:
 
 
 @dataclass
-class Servidor:
-    """ Objeto para processar ticks de tarefas de usuário. """
+class Servidor(ABC):
+    """ Interface para servidores. """
     umax: int
     custo_por_tick: int = 1
     usuários: list[Usuário] = field(default_factory=list)
@@ -20,6 +22,30 @@ class Servidor:
             sum(u.ttask for u in self.usuários) - self._total_ticks >
             sum(u.ttask for u in other.usuários) - other._total_ticks
         )
+
+    @abstractmethod
+    def disponível(self) -> bool:
+        """ Deve ser implementado. """
+
+    @abstractmethod
+    def adiciona_usuário(self, usuário) -> None:
+        """ Deve ser implementado. """
+
+    @abstractmethod
+    def custo(self) -> int:
+        """ Deve ser implementado. """
+
+    @abstractmethod
+    def tick(self) -> None:
+        """ Deve ser implementado. """
+
+    @abstractmethod
+    def a_finalizar(self) -> bool:
+        """ Deve ser implementado. """
+
+
+class ServidorTipoUm(Servidor):
+    """ Objeto para processar ticks de tarefas de usuário. """
 
     def disponível(self) -> bool:
         """ Disponível para novos usuários. """
@@ -48,10 +74,20 @@ class Servidor:
         return not any(u.ttask for u in self.usuários)
 
 
+def cria_usuário(ttask: int):
+    return Usuário(ttask)
+
+
+def cria_servidor_tipo_um(umax: int):
+    return ServidorTipoUm(umax)
+
+
 @dataclass
 class Balanceador:
     """ Balanceador de cargas de tarefas de usuários em servidores. """
     path_entrada: str
+    fábrica_usuário: Callable
+    fábrica_servidor: Callable
     _ttask: int = field(init=False)
     _umax: int = field(init=False)
     _numero_novos_usuários: list = field(init=False)
@@ -71,13 +107,13 @@ class Balanceador:
     def _associa_usuários_servidores(self, n_usuários) -> None:
         """ Cria usuários e os associam à servidores existentes ou criados. """
         for _ in range(n_usuários):
-            usuário = Usuário(self._ttask)
+            usuário = self.fábrica_usuário(self._ttask)
             s = next(
                 (s for s in sorted(self._servidores) if s.disponível()),
                 None
             )
             if not s:
-                s = Servidor(self._umax)
+                s = self.fábrica_servidor(self._umax)
                 s.adiciona_usuário(usuário)
                 self._servidores.append(s)
             else:
@@ -119,10 +155,15 @@ class Balanceador:
                 break
 
         saída.append(str(self._custo_total))
-
-        return '\n'.join(s for s in saída if s)
+        r = '\n'.join(s for s in saída if s)
+        print(r)
+        return r
 
 
 def main(path_entrada):
-    balanceador = Balanceador(path_entrada)
+    balanceador = Balanceador(
+        path_entrada,
+        cria_usuário,
+        cria_servidor_tipo_um
+    )
     return balanceador.processa_tarefas()
