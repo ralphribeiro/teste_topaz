@@ -1,6 +1,5 @@
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Callable
+from typing import Callable, Protocol
 
 
 @dataclass(eq=False)
@@ -8,9 +7,35 @@ class Usuário:
     ttask: int
 
 
-@dataclass
-class Servidor(ABC):
+class Servidor(Protocol):
     """ Interface para servidores. """
+    umax: int
+    custo_por_tick: int
+    usuários: list[Usuário]
+    _total_ticks: int
+
+    def __gt__(self, other) -> bool:
+        """ Deve ser implementado. """
+
+    def disponível(self) -> bool:
+        """ Deve ser implementado. """
+
+    def adiciona_usuário(self, usuário) -> None:
+        """ Deve ser implementado. """
+
+    def custo(self) -> int:
+        """ Deve ser implementado. """
+
+    def tick(self) -> None:
+        """ Deve ser implementado. """
+
+    def a_finalizar(self) -> bool:
+        """ Deve ser implementado. """
+
+
+@dataclass
+class ServidorTipoUm():
+    """ Objeto para processar ticks de tarefas de usuário. """
     umax: int
     custo_por_tick: int = 1
     usuários: list[Usuário] = field(default_factory=list)
@@ -22,30 +47,6 @@ class Servidor(ABC):
             sum(u.ttask for u in self.usuários) - self._total_ticks >
             sum(u.ttask for u in other.usuários) - other._total_ticks
         )
-
-    @abstractmethod
-    def disponível(self) -> bool:
-        """ Deve ser implementado. """
-
-    @abstractmethod
-    def adiciona_usuário(self, usuário) -> None:
-        """ Deve ser implementado. """
-
-    @abstractmethod
-    def custo(self) -> int:
-        """ Deve ser implementado. """
-
-    @abstractmethod
-    def tick(self) -> None:
-        """ Deve ser implementado. """
-
-    @abstractmethod
-    def a_finalizar(self) -> bool:
-        """ Deve ser implementado. """
-
-
-class ServidorTipoUm(Servidor):
-    """ Objeto para processar ticks de tarefas de usuário. """
 
     def disponível(self) -> bool:
         """ Disponível para novos usuários. """
@@ -78,7 +79,7 @@ def cria_usuário(ttask: int):
     return Usuário(ttask)
 
 
-def cria_servidor_tipo_um(umax: int):
+def cria_servidor_tipo_um(umax: int) -> Servidor:
     return ServidorTipoUm(umax)
 
 
