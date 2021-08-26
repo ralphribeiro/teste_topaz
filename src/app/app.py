@@ -89,7 +89,7 @@ class Balanceador:
     _custo_total: int = 0
 
     def _le_entradas(self) -> None:
-        """ Obtem dados do arquido de entrada. """
+        """ Obtem dados de entrada. """
         self._ttask, self._umax, self._numero_novos_usuários = self.fábrica_entrada()
 
     def __post_init__(self):
