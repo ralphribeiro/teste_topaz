@@ -1,8 +1,9 @@
+from functools import partial
 from os import path
 
 from src.app.app import (
-    Balanceador, cria_servidor_tipo_um, cria_usuário, main, Servidor,
-    ServidorTipoUm, Usuário
+    Balanceador, cria_servidor_tipo_um, cria_usuário, entrada_txt, main,
+    Servidor, ServidorTipoUm, Usuário
 )
 
 """
@@ -110,6 +111,7 @@ class TesteServidor:
 def test_cria_usuário():
     assert isinstance(cria_usuário(1), Usuário)
 
+
 def test_cria_servidor_tipo_um():
     assert isinstance(cria_servidor_tipo_um(1), Servidor)
 
@@ -117,7 +119,8 @@ def test_cria_servidor_tipo_um():
 class TestBalanceador:
     def test_carrega_entrada_válida(self):
         balanceador = Balanceador(
-            path.join(path.dirname(__file__), 'input.txt'),
+            partial(entrada_txt, path.join(
+                path.dirname(__file__), 'input.txt')),
             cria_usuário,
             cria_servidor_tipo_um
         )
@@ -127,7 +130,8 @@ class TestBalanceador:
 
     def test_cria_usuario_servidor(self):
         balanceador = Balanceador(
-            path.join(path.dirname(__file__), 'input_test.txt'),
+            partial(entrada_txt, path.join(
+                path.dirname(__file__), 'input_test.txt')),
             cria_usuário,
             cria_servidor_tipo_um
         )
@@ -136,7 +140,8 @@ class TestBalanceador:
 
     def test_cria_usuários_em_servidores(self):
         balanceador = Balanceador(
-            path.join(path.dirname(__file__), 'input_test2.txt'),
+            partial(entrada_txt, path.join(
+                path.dirname(__file__), 'input_test2.txt')),
             cria_usuário,
             cria_servidor_tipo_um
         )
@@ -147,7 +152,8 @@ class TestBalanceador:
 
     def test_servidor_removido_quando_finalizado(self):
         balanceador = Balanceador(
-            path.join(path.dirname(__file__), 'input_test.txt'),
+            partial(entrada_txt, path.join(
+                path.dirname(__file__), 'input_test.txt')),
             cria_usuário,
             cria_servidor_tipo_um
         )
@@ -156,7 +162,8 @@ class TestBalanceador:
 
     def test_processa_tarefas(self):
         balanceador = Balanceador(
-            path.join(path.dirname(__file__), 'input.txt'),
+            partial(entrada_txt, path.join(
+                path.dirname(__file__), 'input.txt')),
             cria_usuário,
             cria_servidor_tipo_um
         )

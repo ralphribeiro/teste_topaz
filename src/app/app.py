@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from functools import partial
 from typing import Callable, Protocol
 
 
@@ -75,18 +76,10 @@ class ServidorTipoUm():
         return not any(u.ttask for u in self.usuários)
 
 
-def cria_usuário(ttask: int):
-    return Usuário(ttask)
-
-
-def cria_servidor_tipo_um(umax: int) -> Servidor:
-    return ServidorTipoUm(umax)
-
-
 @dataclass
 class Balanceador:
     """ Balanceador de cargas de tarefas de usuários em servidores. """
-    path_entrada: str
+    fábrica_entrada: Callable
     fábrica_usuário: Callable
     fábrica_servidor: Callable
     _ttask: int = field(init=False)
@@ -97,10 +90,7 @@ class Balanceador:
 
     def _le_entradas(self) -> None:
         """ Obtem dados do arquido de entrada. """
-        with open(self.path_entrada) as f:
-            self._ttask = int(f.readline())
-            self._umax = int(f.readline())
-            self._numero_novos_usuários = [int(li) for li in f.readlines()]
+        self._ttask, self._umax, self._numero_novos_usuários = self.fábrica_entrada()
 
     def __post_init__(self):
         self._le_entradas()
@@ -161,11 +151,27 @@ class Balanceador:
         return r
 
 
+def entrada_txt(path: str) -> tuple:
+    """ Obtem dados do arquido de entrada. """
+    with open(path) as f:
+        ttask = int(f.readline())
+        umax = int(f.readline())
+        numero_novos_usuários = [int(i) for i in f.readlines()]
+        return ttask, umax, numero_novos_usuários
+
+
+def cria_usuário(ttask: int):
+    return Usuário(ttask)
+
+
+def cria_servidor_tipo_um(umax: int) -> Servidor:
+    return ServidorTipoUm(umax)
+
+
 def main(path_entrada):
     balanceador = Balanceador(
-        path_entrada,
+        partial(entrada_txt, path_entrada),
         cria_usuário,
         cria_servidor_tipo_um
     )
     return balanceador.processa_tarefas()
-
