@@ -168,3 +168,4 @@ def main(path_entrada):
         cria_servidor_tipo_um
     )
     return balanceador.processa_tarefas()
+
