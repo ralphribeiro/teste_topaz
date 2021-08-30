@@ -161,7 +161,7 @@ def entrada_txt(path: str) -> tuple:
 def entrada_aleatória(qtd_usuários: int = 2):
     """ Obtém dados aleatórios para entrada. """
     ttask = 4
-    umax = randrange()
+    umax = 3
     usuários = [randrange(2, 30) for _ in range(qtd_usuários)]
     return ttask, umax, usuários
 
@@ -190,7 +190,3 @@ def main_entrada_falsa():
         cria_servidor_tipo_um
     )
     print(balanceador.processa_tarefas())
-
-
-if __name__ == '__main__':
-    main_entrada_falsa()
