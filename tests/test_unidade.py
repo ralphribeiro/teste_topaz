@@ -2,8 +2,8 @@ from functools import partial
 from os import path
 
 from src.app.app import (
-    Balanceador, cria_servidor_tipo_um, cria_usuário, entrada_txt, main,
-    Servidor, ServidorTipoUm, Usuário
+    Balanceador, cria_servidor_tipo_um, cria_usuário, entrada_aleatória,
+    entrada_txt, main, Servidor, ServidorTipoUm, Usuário
 )
 
 """
@@ -115,6 +115,8 @@ def test_cria_usuário():
 def test_cria_servidor_tipo_um():
     assert isinstance(cria_servidor_tipo_um(1), Servidor)
 
+def test_entrada_aleatória():
+    assert isinstance(entrada_aleatória(), tuple)
 
 class TestBalanceador:
     def test_carrega_entrada_válida(self):

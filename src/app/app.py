@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from functools import partial
+from random import randrange
 from typing import Callable, Protocol
 
 
@@ -13,7 +14,6 @@ class Servidor(Protocol):
     umax: int
     custo_por_tick: int
     usuários: list[Usuário]
-    _total_ticks: int
 
     def __gt__(self, other) -> bool:
         """ Deve ser implementado. """
@@ -146,9 +146,7 @@ class Balanceador:
                 break
 
         saída.append(str(self._custo_total))
-        r = '\n'.join(s for s in saída if s)
-        print(r)
-        return r
+        return '\n'.join(s for s in saída if s)
 
 
 def entrada_txt(path: str) -> tuple:
@@ -158,6 +156,14 @@ def entrada_txt(path: str) -> tuple:
         umax = int(f.readline())
         numero_novos_usuários = [int(i) for i in f.readlines()]
         return ttask, umax, numero_novos_usuários
+
+
+def entrada_aleatória(qtd_usuários: int = 2):
+    """ Obtém dados aleatórios para entrada. """
+    ttask = 4
+    umax = randrange()
+    usuários = [randrange(2, 30) for _ in range(qtd_usuários)]
+    return ttask, umax, usuários
 
 
 def cria_usuário(ttask: int):
@@ -175,3 +181,16 @@ def main(path_entrada):
         cria_servidor_tipo_um
     )
     return balanceador.processa_tarefas()
+
+
+def main_entrada_falsa():
+    balanceador = Balanceador(
+        partial(entrada_aleatória, 1000),
+        cria_usuário,
+        cria_servidor_tipo_um
+    )
+    print(balanceador.processa_tarefas())
+
+
+if __name__ == '__main__':
+    main_entrada_falsa()
